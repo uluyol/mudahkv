@@ -1,7 +1,7 @@
 
-BINS = mudahd mudahc
+BINS = mudahd mudahc sendout
 REPO = uluyol/mudah
-VERSION = 0.1
+VERSION = 0.2
 
 .PHONY: all docker-build
 
