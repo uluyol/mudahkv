@@ -1,6 +1,6 @@
 
 BINS = mudahd mudahc sendout
-REPO = uluyol/mudah
+REPO = quay.io/uluyol/mudah
 VERSION = 0.3
 
 .PHONY: all docker-build
