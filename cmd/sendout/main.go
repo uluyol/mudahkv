@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"time"
@@ -24,8 +26,13 @@ func main() {
 	cmdName := os.Args[3]
 	cmdArgs := os.Args[4:]
 
+	var buf bytes.Buffer
 	cmd := exec.Command(cmdName, cmdArgs...)
-	out, outErr := cmd.CombinedOutput()
+	w := io.MultiWriter(os.Stdout, &buf)
+	cmd.Stdout = w
+	cmd.Stderr = w
+	outErr := cmd.Run()
+	out := buf.Bytes()
 	errString := "success"
 	if outErr != nil {
 		errString = fmt.Sprintf("failure: %v", outErr)
