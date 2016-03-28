@@ -1,5 +1,5 @@
 hash: 586d4a482b90462225020e72283d0db47c71fa8841d79d02ec4c7d8b7f7a64c6
-updated: 2016-03-28T12:59:57.829312053-04:00
+updated: 2016-03-28T15:29:33.86381841-04:00
 imports:
 - name: github.com/boltdb/bolt
   version: 831b652a7f8dbefaf94da0eb66abd46c0c4bcf23
@@ -9,6 +9,8 @@ imports:
   version: 8d92cf5fc15a4382f8964b08e1f42a75c0591aa3
   subpackages:
   - proto
+- name: github.com/inconshreveable/mousetrap
+  version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/spf13/cobra
   version: c678ff029ee250b65714e518f4f5c5cb934955de
 - name: github.com/spf13/pflag
@@ -21,6 +23,10 @@ imports:
   - trace
   - http2/hpack
   - internal/timeseries
+- name: golang.org/x/sys
+  version: 320cb01ddbbf0473674c2585f9b6e245721de355
+  subpackages:
+  - unix
 - name: google.golang.org/grpc
   version: 9e3a674ceba65708273cf1cd8e71a1bdce68107b
   subpackages:
