@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"io"
+	"os"
 
 	"golang.org/x/net/context"
 
@@ -24,12 +26,16 @@ Example Usage: mudahc get key`,
 			dief("unable to connect to server: %v", err)
 		}
 		ctx, _ := context.WithTimeout(context.Background(), reqTimeout)
-		v, err := c.Get(ctx, args[0])
+		r, err := c.GetStream(ctx, args[0])
 		if err != nil {
 			c.Close()
 			dief("unable to get value: %v", err)
 		}
-		fmt.Println(v)
+		_, err = io.Copy(os.Stdout, r)
+		fmt.Println()
+		if err != nil {
+			dief("unable to get full value: %v", err)
+		}
 		c.Close()
 	},
 }

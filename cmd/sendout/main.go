@@ -33,9 +33,9 @@ func main() {
 	cmd.Stderr = w
 	outErr := cmd.Run()
 	out := buf.Bytes()
-	errString := "success"
+	errString := []byte("success")
 	if outErr != nil {
-		errString = fmt.Sprintf("failure: %v", outErr)
+		errString = []byte(fmt.Sprintf("failure: %v", outErr))
 	}
 
 	c, err := client.Dial(addr)
@@ -46,7 +46,7 @@ func main() {
 
 	// try to send whatever we can to the DB, fail at the end
 	ctx, _ := context.WithTimeout(context.Background(), timeout)
-	if err := c.Set(ctx, outputKey, string(out)); err != nil {
+	if err := c.Set(ctx, outputKey, out); err != nil {
 		fmt.Fprintf(os.Stderr, "error sending output: %v", err)
 		failureOccured = true
 	}

@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"io"
+	"os"
 
 	"golang.org/x/net/context"
 
@@ -24,14 +26,20 @@ Example Usage: mudahc list prefix`,
 			dief("unable to connect to server: %v", err)
 		}
 		ctx, _ := context.WithTimeout(context.Background(), reqTimeout)
-		kvs, err := c.List(ctx, args[0])
+		streams, err := c.ListStream(ctx, args[0])
 		if err != nil {
 			c.Close()
 			dief("unable to list values: %v", err)
 		}
-		for _, kv := range kvs {
-			fmt.Printf("%s:\n", kv.Key)
-			fmt.Println(kv.Value)
+		for streams.Next() {
+			fmt.Printf("%s:\n", streams.Key())
+			if _, err := io.Copy(os.Stdout, streams.Value()); err != nil {
+				dief("error listing value: %v", err)
+			}
+			fmt.Println()
+		}
+		if streams.Err() != nil {
+			fmt.Printf("error occured during list: %v", err)
 		}
 		c.Close()
 	},

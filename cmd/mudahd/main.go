@@ -1,17 +1,28 @@
 package main
 
+/*
+
+Data is stored using boltdb. We use two buckets, one for storing
+metadata and the other for storing chunks. We chunk data to reduce
+memory requirements on the server. For any given key β, if we store
+the value in ω chunks, the value of β in the meta bucket will be ω,
+and we will store chunk 0 as 0~β, 1 as, 1~β, up through (ω-1)~β in
+the chunk bucket.
+
+*/
+
 import (
 	"bytes"
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"net"
 	"os"
+	"strconv"
 
 	"google.golang.org/grpc"
 	_ "google.golang.org/grpc/grpclog/glogger"
-
-	"golang.org/x/net/context"
 
 	"github.com/boltdb/bolt"
 	"github.com/golang/glog"
@@ -19,7 +30,8 @@ import (
 )
 
 var (
-	keyBucketName = []byte("key")
+	keyBucketName  = []byte("key")
+	metaBucketName = []byte("meta")
 
 	dbPath  = flag.String("f", "", "path to database file")
 	portNum = flag.Int("p", 6070, "port to listen on")
@@ -38,8 +50,11 @@ func newServer(dbPath string) (*server, error) {
 	if err != nil {
 		return nil, err
 	}
-	_, err = tx.CreateBucketIfNotExists(keyBucketName)
-	if err != nil {
+	if _, err := tx.CreateBucketIfNotExists(keyBucketName); err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	if _, err := tx.CreateBucketIfNotExists(metaBucketName); err != nil {
 		tx.Rollback()
 		return nil, err
 	}
@@ -49,54 +64,92 @@ func newServer(dbPath string) (*server, error) {
 	return &server{db}, nil
 }
 
-func (s *server) Get(ctx context.Context, req *pb.GetRequest) (*pb.GetReply, error) {
+type chunkSender interface {
+	Send(*pb.KVChunk) error
+}
+
+func (s *server) getChunks(tx *bolt.Tx, β string, stream chunkSender) error {
+	ωBytes := tx.Bucket(metaBucketName).Get([]byte(β))
+	if ωBytes == nil {
+		return errors.New("no such file for key")
+	}
+	ω, err := strconv.Atoi(string(ωBytes))
+	if err != nil {
+		return fmt.Errorf("failed to decode chunk count, possible corruption: %v", err)
+	}
+	for i := 0; i < ω; i++ {
+		c := tx.Bucket(keyBucketName).Get([]byte(fmt.Sprintf("%d~%s", i, β)))
+		if err := stream.Send(&pb.KVChunk{Key: β, Value: c}); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *server) Get(req *pb.Key, stream pb.Mudah_GetServer) error {
 	glog.Infof("GET %s", req.Key)
 	tx, err := s.db.Begin(false)
 	if err != nil {
-		return nil, fmt.Errorf("failed to initiate tx: %v", err)
+		return fmt.Errorf("failed to initiate tx: %v", err)
 	}
 	defer tx.Rollback() // read-only
-	value := tx.Bucket(keyBucketName).Get([]byte(req.Key))
-	if value == nil {
-		return nil, errors.New("no such file for key")
-	}
-	return &pb.GetReply{Key: req.Key, Value: string(value)}, nil
+	return s.getChunks(tx, req.Key, stream)
 }
 
-func (s *server) Set(ctx context.Context, req *pb.SetRequest) (*pb.SetReply, error) {
-	glog.Infof("SET %s", req.Key)
+func (s *server) Set(stream pb.Mudah_SetServer) error {
+	glog.Info("Got SET request")
 	tx, err := s.db.Begin(true)
 	if err != nil {
-		return nil, fmt.Errorf("failed to initiate tx: %v", err)
+		return fmt.Errorf("failed to initiate tx: %v", err)
 	}
-	err = tx.Bucket(keyBucketName).Put([]byte(req.Key), []byte(req.Value))
+	var ω int
+	var β string
+	for {
+		chunk, err := stream.Recv()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("failed to set value: %v", err)
+		}
+		β = chunk.Key
+		err = tx.Bucket(keyBucketName).Put([]byte(fmt.Sprintf("%d~%s", ω, β)), chunk.Value)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("failed to save chunk %d: %v", ω, err)
+		}
+		ω++
+	}
+	err = tx.Bucket(metaBucketName).Put([]byte(β), []byte(strconv.Itoa(ω)))
 	if err != nil {
 		tx.Rollback()
-		return nil, fmt.Errorf("failed to set value: %v", err)
+		return fmt.Errorf("failed to set metadata for %s: %v", β, err)
 	}
 	defer tx.Commit()
-	return &pb.SetReply{Key: req.Key, Value: req.Value}, nil
+	glog.Infof("SET %s", β)
+	return stream.SendAndClose(&pb.Key{Key: β})
 }
 
-func (s *server) List(ctx context.Context, req *pb.ListRequest) (*pb.ListReply, error) {
+func (s *server) List(req *pb.ListRequest, stream pb.Mudah_ListServer) error {
 	glog.Infof("LIST %s", req.Prefix)
 	tx, err := s.db.Begin(false)
 	if err != nil {
-		return nil, fmt.Errorf("failed to initiate tx: %v", err)
+		return fmt.Errorf("failed to initiate tx: %v", err)
 	}
 	defer tx.Rollback() // read-only
-	c := tx.Bucket(keyBucketName).Cursor()
-	var values []*pb.GetReply
+
+	c := tx.Bucket(metaBucketName).Cursor()
+	var keys []string
 	bytePrefix := []byte(req.Prefix)
-	for ck, cv := c.Seek(bytePrefix); ck != nil && bytes.HasPrefix(ck, bytePrefix); ck, cv = c.Next() {
-		select {
-		case <-ctx.Done():
-			return nil, errors.New("deadline expired")
-		default:
-			values = append(values, &pb.GetReply{Key: string(ck), Value: string(cv)})
+	for ck, _ := c.Seek(bytePrefix); ck != nil && bytes.HasPrefix(ck, bytePrefix); ck, _ = c.Next() {
+		keys = append(keys, string(ck))
+	}
+	for _, k := range keys {
+		if err := s.getChunks(tx, k, stream); err != nil {
+			return err
 		}
 	}
-	return &pb.ListReply{Values: values}, nil
+	return nil
 }
 
 func main() {
@@ -114,6 +167,6 @@ func main() {
 		glog.Fatalf("failed to listen: %v", err)
 	}
 	gs := grpc.NewServer()
-	pb.RegisterMudahKVServer(gs, s)
+	pb.RegisterMudahServer(gs, s)
 	gs.Serve(lis)
 }
