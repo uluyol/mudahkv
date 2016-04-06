@@ -5,19 +5,23 @@ VERSION = 0.4
 
 .PHONY: all docker-build
 
-all: pb/mudah.pb.go
+all: lib/pb/mudah.pb.go
 
-pb/mudah.pb.go: pb/mudah.proto
-	cd pb && protoc --go_out=plugins=grpc:. mudah.proto
+lib/pb/mudah.pb.go: lib/pb/mudah.proto
+	cd lib/pb && protoc --go_out=plugins=grpc:. mudah.proto
 
-$(BINS):
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build github.com/uluyol/mudahkv/cmd/$@
+.gbbuild: cmd
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 gb build -R cmd
+	touch $@
 
-docker-build: pb/mudah.pb.go $(BINS)
+$(BINS): .gbbuild
+	mv cmd/bin/$@-linux-amd64 $@
+
+docker-build: lib/pb/mudah.pb.go $(BINS)
 	docker build -t $(REPO):$(VERSION) .
 
 docker-push: docker-build
 	docker push $(REPO):$(VERSION)
 
 clean:
-	rm -f $(BINS)
+	rm -rf $(BINS) .gbbuild cmd/pkg cmd/bins
