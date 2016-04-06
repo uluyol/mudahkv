@@ -24,4 +24,4 @@ docker-push: docker-build
 	docker push $(REPO):$(VERSION)
 
 clean:
-	rm -rf $(BINS) .gbbuild cmd/pkg cmd/bins
+	rm -rf $(BINS) .gbbuild cmd/pkg cmd/bin
