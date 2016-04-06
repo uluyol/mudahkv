@@ -10,7 +10,7 @@ import (
 
 	"golang.org/x/net/context"
 
-	"github.com/uluyol/mudahkv/client"
+	"github.com/uluyol/mudahkv/lib/client"
 )
 
 const timeout = 10 * time.Second

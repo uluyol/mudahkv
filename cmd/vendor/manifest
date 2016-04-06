@@ -178,7 +178,7 @@
 		{
 			"importpath": "github.com/uluyol/mudahkv/lib",
 			"repository": "https://github.com/uluyol/mudahkv",
-			"revision": "b07a8ec60ac719891aa869527aa6c51880b2211c",
+			"revision": "21b095a69c3cf2d652d7f752f1748de9df5cad50",
 			"branch": "master",
 			"path": "/lib"
 		},

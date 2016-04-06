@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/context"
 
 	"github.com/spf13/cobra"
-	"github.com/uluyol/mudahkv/client"
+	"github.com/uluyol/mudahkv/lib/client"
 )
 
 var getCmd = &cobra.Command{

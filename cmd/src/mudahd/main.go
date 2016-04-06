@@ -26,7 +26,7 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/golang/glog"
-	"github.com/uluyol/mudahkv/pb"
+	"github.com/uluyol/mudahkv/lib/pb"
 )
 
 var (
