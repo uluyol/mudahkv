@@ -6,7 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/uluyol/mudahkv/pb"
+	"github.com/uluyol/mudahkv/lib/pb"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )

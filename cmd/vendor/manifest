@@ -176,10 +176,11 @@
 			"branch": "master"
 		},
 		{
-			"importpath": "github.com/uluyol/mudahkv",
+			"importpath": "github.com/uluyol/mudahkv/lib",
 			"repository": "https://github.com/uluyol/mudahkv",
-			"revision": "501a5d8a6d5ea3302f1007f400607a66ce790da0",
-			"branch": "master"
+			"revision": "b07a8ec60ac719891aa869527aa6c51880b2211c",
+			"branch": "master",
+			"path": "/lib"
 		},
 		{
 			"importpath": "golang.org/x/crypto/ssh/terminal",
