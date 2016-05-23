@@ -1,0 +1,133 @@
+hash: e320e55aa8843d72f32a23ad4c2f18e481d2ca22dbfab5fb8635fd1e11b620f5
+updated: 2016-05-23T16:38:28.883250494-04:00
+imports:
+- name: github.com/boltdb/bolt
+  version: 831b652a7f8dbefaf94da0eb66abd46c0c4bcf23
+  repo: https://github.com/boltdb/bolt
+- name: github.com/BurntSushi/toml
+  version: bbd5bb678321a0d6e58f1099321dfa73391c1b6f
+  repo: https://github.com/BurntSushi/toml
+- name: github.com/cpuguy83/go-md2man
+  version: 2724a9c9051aa62e9cca11304e7dd518e9e41599
+  repo: https://github.com/cpuguy83/go-md2man
+  subpackages:
+  - md2man
+- name: github.com/golang/glog
+  version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
+  repo: https://github.com/golang/glog
+- name: github.com/golang/protobuf
+  version: dda510ac0fd43b39770f22ac6260eb91d377bce3
+  repo: https://github.com/golang/protobuf
+  subpackages:
+  - proto
+  - proto/testdata
+  - protoc-gen-go/descriptor
+  - protoc-gen-go/generator
+  - protoc-gen-go/grpc
+  - protoc-gen-go/plugin
+  - ptypes/any
+  - ptypes/duration
+  - ptypes/struct
+  - ptypes/timestamp
+  - ptypes/wrappers
+- name: github.com/hashicorp/hcl
+  version: 2604f3bda7e8960c1be1063709e7d7f0765048d0
+  repo: https://github.com/hashicorp/hcl
+- name: github.com/inconshreveable/mousetrap
+  version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
+- name: github.com/kr/pretty
+  version: add1dbc86daf0f983cd4a48ceb39deb95c729b67
+  repo: https://github.com/kr/pretty
+- name: github.com/kr/text
+  version: bb797dc4fb8320488f47bf11de07a733d7233e1f
+  repo: https://github.com/kr/text
+- name: github.com/magiconair/properties
+  version: c265cfa48dda6474e208715ca93e987829f572f8
+  repo: https://github.com/magiconair/properties
+- name: github.com/mitchellh/mapstructure
+  version: d2dd0262208475919e1a362f675cfc0e7c10e905
+  repo: https://github.com/mitchellh/mapstructure
+- name: github.com/russross/blackfriday
+  version: b43df972fb5fdf3af8d2e90f38a69d374fe26dd0
+  repo: https://github.com/russross/blackfriday
+- name: github.com/shurcooL/sanitized_anchor_name
+  version: 10ef21a441db47d8b13ebcc5fd2310f636973c77
+  repo: https://github.com/shurcooL/sanitized_anchor_name
+- name: github.com/spf13/cast
+  version: 27b586b42e29bec072fe7379259cc719e1289da6
+  repo: https://github.com/spf13/cast
+- name: github.com/spf13/cobra
+  version: 4c05eb1145f16d0e6bb4a3e1b6d769f4713cb41f
+  repo: https://github.com/spf13/cobra
+- name: github.com/spf13/jwalterweatherman
+  version: 33c24e77fb80341fe7130ee7c594256ff08ccc46
+  repo: https://github.com/spf13/jwalterweatherman
+- name: github.com/spf13/pflag
+  version: 7f60f83a2c81bc3c3c0d5297f61ddfa68da9d3b7
+  repo: https://github.com/spf13/pflag
+- name: github.com/spf13/viper
+  version: c975dc1b4eacf4ec7fdbf0873638de5d090ba323
+  repo: https://github.com/spf13/viper
+- name: github.com/uluyol/mudahkv
+  version: 21b095a69c3cf2d652d7f752f1748de9df5cad50
+  repo: https://github.com/uluyol/mudahkv
+  subpackages:
+  - lib
+  - lib/client
+  - lib/pb
+- name: golang.org/x/crypto
+  version: b8a0f4bb4040f8d884435cff35b9691e362cf00c
+  repo: https://go.googlesource.com/crypto
+  subpackages:
+  - ssh/terminal
+- name: golang.org/x/net
+  version: af4fee9d05b66edc24197d189e6118f8ebce8c2b
+  repo: https://go.googlesource.com/net
+  subpackages:
+  - context
+  - html
+  - http2
+  - internal/iana
+  - internal/timeseries
+  - ipv4
+  - ipv6
+  - trace
+  - webdav/internal/xml
+  - http2/hpack
+- name: golang.org/x/oauth2
+  version: 33fa30fe45020622640e947917fd1fc4c81e3dce
+  repo: https://go.googlesource.com/oauth2
+- name: golang.org/x/sys
+  version: d4feaf1a7e61e1d9e79e6c4e76c6349e9cab0a03
+  subpackages:
+  - unix
+- name: golang.org/x/text
+  version: 1b466db55e0ba5d56ef5315c728216b42f796491
+  repo: https://go.googlesource.com/text
+  subpackages:
+  - encoding
+  - internal/tag
+  - internal/utf8internal
+  - language
+  - runes
+  - transform
+- name: google.golang.org/grpc
+  version: ecd00d52ac82a2cd37e17bf91d9c6ca228b71745
+  repo: https://github.com/grpc/grpc-go
+  subpackages:
+  - grpclog/glogger
+  - codes
+  - credentials
+  - grpclog
+  - internal
+  - metadata
+  - naming
+  - transport
+  - peer
+- name: gopkg.in/fsnotify.v1
+  version: 875cf421b32f8f1b31bd43776297876d01542279
+  repo: https://gopkg.in/fsnotify.v1
+- name: gopkg.in/yaml.v2
+  version: a83829b6f1293c91addabc89d0571c246397bbf4
+  repo: https://gopkg.in/yaml.v2
+devImports: []

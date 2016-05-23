@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package mudah;
+
+option go_package = "pb";
+
+service Mudah {
+	rpc Get (Key) returns (stream KVChunk) {}
+	rpc Set (stream KVChunk) returns (Key) {}
+	rpc List (ListRequest) returns (stream KVChunk) {}
+}
+
+message Key {
+	string key = 1;
+}
+
+message KVChunk {
+	string key = 1;
+	bytes value = 2;
+}
+
+message ListRequest {
+	string prefix = 1;
+}
